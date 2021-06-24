@@ -27,6 +27,8 @@ class ACCCompanion(toga.App):
     LABEL_PADDING = (10, 20)
     LABEL_STYLE = Pack(width=100, padding=LABEL_PADDING, alignment='right')
     INPUT_STYLE = Pack(width=120, padding=0)
+    PARTICLE_SPECIES_FEEDBACK_VALID = '\N{Large Green Circle}'
+    PARTICLE_SPECIES_FEEDBACK_INVALID = '\N{Large Red Circle}'
 
     def startup(self):
         self.number_of_nucleons = 1
@@ -92,13 +94,15 @@ class ACCCompanion(toga.App):
             self.beam.mass = int(number_of_nucleons) * ATOMIC_WEIGHTS_IN_GEV[symbol]
             self.beam.charge = int(charge_state)
             self.number_of_nucleons = int(number_of_nucleons)
-            self.particle_species_status.text = '\N{Large Green Circle}'
+            self.particle_species_status.text = self.PARTICLE_SPECIES_FEEDBACK_VALID
+            self.particle_species_status.refresh()  # required on Android
             # Use the following to trigger an udate of the energy fields; the value must actually change.
             if (current_value := self.energy_inputs['energy'].value):
                 self.energy_inputs['energy'].value = f'{current_value}0'
                 self.energy_inputs['energy'].value = current_value
         else:
-            self.particle_species_status.text = '\N{Large Red Circle}'
+            self.particle_species_status.text = self.PARTICLE_SPECIES_FEEDBACK_INVALID
+            self.particle_species_status.refresh()  # required on Android
 
     @Guard.block_recursion
     def energy_changed(self, field):
