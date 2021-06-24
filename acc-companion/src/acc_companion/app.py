@@ -25,8 +25,8 @@ class ACCCompanion(toga.App):
     FLOAT_FORMAT = '{:.6f}'.format
     PER_NUCLEON = ('energy', 'pc')
     LABEL_PADDING = (10, 20)
-    LABEL_STYLE = Pack(width=120, padding=LABEL_PADDING, alignment='right')
-    INPUT_STYLE = Pack(width=200, padding=0)
+    LABEL_STYLE = Pack(width=100, padding=LABEL_PADDING, alignment='right')
+    INPUT_STYLE = Pack(width=120, padding=0)
 
     def startup(self):
         self.number_of_nucleons = 1
