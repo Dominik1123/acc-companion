@@ -53,7 +53,7 @@ class ACCCompanion(toga.App):
                 on_change=self.energy_changed,
                 validators=[self.float_validator],
                 style=self.INPUT_STYLE,
-                id=label
+                id=label,
             )
             for label in Beam.energy_definition_precedence
         }
