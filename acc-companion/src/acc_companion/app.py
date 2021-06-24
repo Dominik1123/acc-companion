@@ -32,16 +32,17 @@ class ACCCompanion(toga.App):
         self.number_of_nucleons = 1
         self.beam = Beam(mass=1, charge=1, energy=1)  # use some placeholder values
 
+        self.particle_species_input = toga.TextInput(
+            on_change=self.particle_species_changed,
+            validators=[self.particle_species_validator],
+            placeholder='e.g. 40Ar10+',
+            style=self.INPUT_STYLE,
+        )
         self.particle_species_status = toga.Label('', style=Pack(padding=self.LABEL_PADDING))
         particle_species_box = toga.Box(
             children=[
                 toga.Label('Particle species:', style=self.LABEL_STYLE),
-                toga.TextInput(
-                    on_change=self.particle_species_changed,
-                    validators=[self.particle_species_validator],
-                    placeholder='e.g. 40Ar10+',
-                    style=self.INPUT_STYLE,
-                ),
+                self.particle_species_input,
                 self.particle_species_status,
             ],
             style=Pack(direction=ROW),
@@ -92,6 +93,10 @@ class ACCCompanion(toga.App):
             self.beam.charge = int(charge_state)
             self.number_of_nucleons = int(number_of_nucleons)
             self.particle_species_status.text = '\N{Large Green Circle}'
+            # Use the following to trigger an udate of the energy fields; the value must actually change.
+            if (current_value := self.energy_inputs['energy'].value):
+                self.energy_inputs['energy'].value = f'{current_value}0'
+                self.energy_inputs['energy'].value = current_value
         else:
             self.particle_species_status.text = '\N{Large Red Circle}'
 
