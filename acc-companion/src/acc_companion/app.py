@@ -72,7 +72,6 @@ class ACCCompanion(toga.App):
         main_box = toga.Box(
             children=[
                 particle_species_box,
-                # toga.Divider(direction=toga.Divider.HORIZONTAL),  # doesn't work on Android
                 energy_box,
             ],
             style=Pack(direction=COLUMN)
