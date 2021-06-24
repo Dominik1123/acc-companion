@@ -1,3 +1,5 @@
+acc-companion/linux/
+acc-companion/android/
 *.dist-info
 
 # Byte-compiled / optimized / DLL files
