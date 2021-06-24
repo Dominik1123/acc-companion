@@ -1,0 +1,49 @@
+[tool.briefcase]
+project_name = "ACC Companion"
+bundle = "what.ever"
+version = "0.0.1"
+url = "https://to.be.determined"
+license = "GNU General Public License v3 or later (GPLv3+)"
+author = 'Dominik Vilsmeier'
+author_email = "dominik.vilsmeier1123@gmail.com"
+
+[tool.briefcase.app.acc-companion]
+formal_name = "ACC Companion"
+description = "Useful tools for accelerator physics"
+icon = "src/acc_companion/resources/acc-companion"
+sources = ['src/acc_companion']
+requires = []
+
+
+[tool.briefcase.app.acc-companion.macOS]
+requires = [
+    'toga-cocoa>=0.3.0.dev20',
+]
+
+[tool.briefcase.app.acc-companion.linux]
+requires = [
+    'toga-gtk>=0.3.0.dev20',
+]
+system_requires = [
+    'libgirepository1.0-dev',
+    'libcairo2-dev',
+    'libpango1.0-dev',
+    'libwebkitgtk-3.0-0',
+    'gir1.2-webkit-3.0',
+]
+
+[tool.briefcase.app.acc-companion.windows]
+requires = [
+    'toga-winforms>=0.3.0.dev20',
+]
+
+# Mobile deployments
+[tool.briefcase.app.acc-companion.iOS]
+requires = [
+    'toga-iOS>=0.3.0.dev20',
+]
+
+[tool.briefcase.app.acc-companion.android]
+requires = [
+    'toga-android>=0.3.0.dev20',
+]
