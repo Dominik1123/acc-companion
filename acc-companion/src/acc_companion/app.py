@@ -20,7 +20,7 @@ with importlib.resources.path('acc_companion.resources', 'atomic_weights.json') 
 
 
 class ACCCompanion(toga.App):
-    PARTICLE_SPECIES_PATTERN = re.compile(r'(\d+)([a-z]{2})(\d+)(?:\+)?', flags=re.I)
+    PARTICLE_SPECIES_PATTERN = re.compile(r'(\d+)([a-z]{1,2})(\d+)(?:\+)?', flags=re.I)
     FLOAT_PATTERN = re.compile(r'\d+(\.\d+)?')
     FLOAT_FORMAT = '{:.6f}'.format
     PER_NUCLEON = ('energy', 'pc')
