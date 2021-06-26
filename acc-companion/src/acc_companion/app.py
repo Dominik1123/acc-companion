@@ -23,7 +23,7 @@ class ACCCompanion(toga.App):
     PARTICLE_SPECIES_PATTERN = re.compile(r'(\d+)([a-z]{1,2})(\d+)(?:\+)?', flags=re.I)
     FLOAT_PATTERN = re.compile(r'\d+(\.\d+)?')
     FLOAT_FORMAT = '{:.6f}'.format
-    PER_NUCLEON = ('energy', 'pc')
+    PER_NUCLEON = ('energy', 'momentum')
     LABEL_PADDING = (10, 20)
     LABEL_STYLE = Pack(width=100, padding=LABEL_PADDING, alignment='right')
     INPUT_STYLE = Pack(width=120, padding=0)

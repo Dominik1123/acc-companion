@@ -10,7 +10,7 @@ SPEED_OF_LIGHT = 299792458.0  # [m/s]
 class Beam:
     """Beam particle and energy definition.
 
-    The energy must be specified by one of `energy, pc, gamma, beta, brho` and is considered in that order
+    The energy must be specified by one of `energy, momentum, gamma, beta, rigidity` and is considered in that order
     of precedence.
 
     Attributes
@@ -22,13 +22,13 @@ class Beam:
     energy : float, optional
         Total energy in units of [GeV]. The order of precedence for beam energy definition is the same as
         attributes are listed here.
-    pc : float, optional
-        Particle momentum times the speed of light in units of [GeV].
+    momentum : float, optional
+        Particle momentum in units of [GeV/c].
     gamma : float, optional
         Relativistic gamma factor of the particles.
     beta : float, optional
         Relativistic beta factor of the particles.
-    brho : float, optional
+    rigidity : float, optional
         Magnetic rigidity of the particles in units of [T*m].
 
     Raises
@@ -39,22 +39,22 @@ class Beam:
     mass : float
     charge : int
     energy : float
-    pc : float
+    momentum : float
     gamma : float
     beta : float
-    brho : float
+    rigidity : float
 
-    energy_definition_precedence = ('energy', 'pc', 'gamma', 'beta', 'brho')
-    units = dict(mass='GeV/c^2', charge='e', energy='GeV', pc='GeV/c', gamma='1', beta='1', brho='T*m')
+    energy_definition_precedence = ('energy', 'momentum', 'gamma', 'beta', 'rigidity')
+    units = dict(mass='GeV/c^2', charge='e', energy='GeV', momentum='GeV/c', gamma='1', beta='1', rigidity='T*m')
 
     def __init__(self,
         mass: float = None,
         charge: int = None,
         energy: float = None,
-        pc: float = None,
+        momentum: float = None,
         gamma: float = None,
         beta: float = None,
-        brho: float = None,
+        rigidity: float = None,
         **kwargs
     ):
         self.mass = mass
@@ -66,12 +66,12 @@ class Beam:
             raise ValueError(f'Beam energy must be specified via one of {self.energy_definition_precedence}') from None
 
     @property
-    def pc(self) -> float:
+    def momentum(self) -> float:
         return math.sqrt(self.energy**2 - self.mass**2)
 
-    @pc.setter
-    def pc(self, pc: float) -> None:
-        self.energy = math.sqrt(pc**2 + self.mass**2)
+    @momentum.setter
+    def momentum(self, momentum: float) -> None:
+        self.energy = math.sqrt(momentum**2 + self.mass**2)
 
     @property
     def gamma(self) -> float:
@@ -92,12 +92,12 @@ class Beam:
         self.energy = self.mass / math.sqrt(1. - beta**2)
 
     @property
-    def brho(self) -> float:
-        return self.pc / (abs(self.charge) * SPEED_OF_LIGHT * 1e-9)
+    def rigidity(self) -> float:
+        return self.momentum / (abs(self.charge) * SPEED_OF_LIGHT * 1e-9)
 
-    @brho.setter
-    def brho(self, brho: float) -> None:
-        self.pc = brho * abs(self.charge) * SPEED_OF_LIGHT * 1e-9
+    @rigidity.setter
+    def rigidity(self, rigidity: float) -> None:
+        self.momentum = rigidity * abs(self.charge) * SPEED_OF_LIGHT * 1e-9
 
     def to_dict(self) -> dict:
         return {attr: getattr(self, attr) for attr in get_type_hints(type(self))}
