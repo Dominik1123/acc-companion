@@ -14,9 +14,12 @@ from .beam import Beam
 from .utils import Guard
 
 
-with importlib.resources.path('acc_companion.resources', 'atomic_weights.json') as path:
+with importlib.resources.path('acc_companion.resources', 'atomic_weights_in_MeV.json') as path:
     with open(path) as fh:
-        ATOMIC_WEIGHTS_IN_GEV = {s: w/1e3 for s, w in json.load(fh).items()}
+        ATOMIC_WEIGHTS_IN_GEV = {
+            symbol: {n: w/1e3 for n, w in isotopes.items()}
+            for symbol, isotopes in json.load(fh).items()
+        }
 
 
 class ACCCompanion(toga.App):
@@ -90,10 +93,11 @@ class ACCCompanion(toga.App):
         if field.validate():
             number_of_nucleons, symbol, charge_state = \
                 self.PARTICLE_SPECIES_PATTERN.fullmatch(field.value).groups()
+            number_of_nucleons = int(number_of_nucleons)
 
-            self.beam.mass = int(number_of_nucleons) * ATOMIC_WEIGHTS_IN_GEV[symbol]
+            self.beam.mass = number_of_nucleons * ATOMIC_WEIGHTS_IN_GEV[symbol][number_of_nucleons]
             self.beam.charge = int(charge_state)
-            self.number_of_nucleons = int(number_of_nucleons)
+            self.number_of_nucleons = number_of_nucleons
             self.particle_species_status.text = self.PARTICLE_SPECIES_FEEDBACK_VALID
             self.particle_species_status.refresh()  # required on Android
             # Use the following to trigger an udate of the energy fields; the value must actually change.
@@ -129,9 +133,11 @@ class ACCCompanion(toga.App):
     def particle_species_validator(cls, value):
         match = cls.PARTICLE_SPECIES_PATTERN.fullmatch(value)
         if match is None:
-            return 'use the format <nucleons><symbol><charge>'
+            return 'use the format <isotope><symbol><charge>'
         if match.group(2) not in ATOMIC_WEIGHTS_IN_GEV:
             return 'unknown symbol'
+        if int(match.group(1)) not in ATOMIC_WEIGHTS_IN_GEV[match.group(2)]:
+            return 'unknown isotope'
         return None
 
     @classmethod
