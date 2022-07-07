@@ -45,6 +45,6 @@ for element in pd.read_html(f'{URL}/atomic-weights.htm')[0]['Element']:
             data[element][number_of_nucleons] = AMU_MEV * parse_atomic_weight(atomic_mass) / number_of_nucleons
         print(AVAILABLE)
 
-save_path = Path(__file__).with_name('atomic_weights.json')
+save_path = Path(__file__).with_name('atomic_weights_in_MeV.json')
 with open(save_path, 'w') as fh:
     json.dump(dict(data), fh, indent=2)
