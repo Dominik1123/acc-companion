@@ -17,7 +17,7 @@ from .utils import Guard
 with importlib.resources.path('acc_companion.resources', 'atomic_weights_in_MeV.json') as path:
     with open(path) as fh:
         ATOMIC_WEIGHTS_IN_GEV = {
-            symbol: {n: w/1e3 for n, w in isotopes.items()}
+            symbol: {int(n): w/1e3 for n, w in isotopes.items()}
             for symbol, isotopes in json.load(fh).items()
         }
 
@@ -31,7 +31,9 @@ class ACCCompanion(toga.App):
     LABEL_STYLE = Pack(width=100, padding=LABEL_PADDING, alignment='right')
     INPUT_STYLE = Pack(width=120, padding=0)
     PARTICLE_SPECIES_FEEDBACK_VALID = '\N{Large Green Circle}'
-    PARTICLE_SPECIES_FEEDBACK_INVALID = '\N{Large Red Circle}'
+    PARTICLE_SPECIES_FEEDBACK_INVALID = '\N{Cross Mark}'
+    PARTICLE_SPECIES_FEEDBACK_UNKNOWN_ELEMENT = '\N{Large Red Circle}'
+    PARTICLE_SPECIES_FEEDBACK_UNKNOWN_ISOTOPE = '\N{Large Yellow Circle}'
 
     def startup(self):
         self.number_of_nucleons = 1
@@ -104,9 +106,6 @@ class ACCCompanion(toga.App):
             if (current_value := self.energy_inputs['energy'].value):
                 self.energy_inputs['energy'].value = f'{current_value}0'
                 self.energy_inputs['energy'].value = current_value
-        else:
-            self.particle_species_status.text = self.PARTICLE_SPECIES_FEEDBACK_INVALID
-            self.particle_species_status.refresh()  # required on Android
 
     @Guard.block_recursion
     def energy_changed(self, field):
@@ -129,16 +128,26 @@ class ACCCompanion(toga.App):
                     if input_field is not field:
                         input_field.value = self.FLOAT_FORMAT(properties[input_field.id])
 
-    @classmethod
-    def particle_species_validator(cls, value):
-        match = cls.PARTICLE_SPECIES_PATTERN.fullmatch(value)
+    def particle_species_validator(self, value):
+        match = self.PARTICLE_SPECIES_PATTERN.fullmatch(value)
         if match is None:
+            self._update_particle_species_status(self.PARTICLE_SPECIES_FEEDBACK_INVALID)
             return 'use the format <isotope><symbol><charge>'
-        if match.group(2) not in ATOMIC_WEIGHTS_IN_GEV:
+        elif match.group(2) not in ATOMIC_WEIGHTS_IN_GEV:
+            self._update_particle_species_status(self.PARTICLE_SPECIES_FEEDBACK_UNKNOWN_ELEMENT)
             return 'unknown symbol'
-        if int(match.group(1)) not in ATOMIC_WEIGHTS_IN_GEV[match.group(2)]:
+        elif int(match.group(1)) not in ATOMIC_WEIGHTS_IN_GEV[match.group(2)]:
+            self._update_particle_species_status(self.PARTICLE_SPECIES_FEEDBACK_UNKNOWN_ISOTOPE)
             return 'unknown isotope'
-        return None
+        else:
+            self._update_particle_species_status(self.PARTICLE_SPECIES_FEEDBACK_VALID)
+            return None
+
+    def _update_particle_species_status(self, status):
+        # The following is a workaround because the validator is called before the attribute is set.
+        if hasattr(self, 'particle_species_status'):
+            self.particle_species_status.text = status
+            self.particle_species_status.refresh()  # required on Android
 
     @classmethod
     def float_validator(cls, value):
